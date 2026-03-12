@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Smart Crop Health System</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+
+<body>
+
+
+<!-- HERO SECTION -->
+
+<section class="hero">
+
+<div class="hero-left">
+
+<h1>AI Smart Crop Health & Market Advisor</h1>
+
+<p>
+Detect crop diseases, get treatment advice,
+predict mandi prices, and discover government schemes.
+</p>
+
+<button onclick="openModule('diseaseModule')" class="btn-primary">
+Start Analysis
+</button>
+
+</div>
+
+<div class="hero-right">
+
+<img src="/static/images/farmer.avif">
+
+</div>
+
+</section>
+
+
+
+<!-- FLOATING MODULE BUTTONS -->
+
+<section class="floating-menu">
+
+<button onclick="openModule('diseaseModule')" class="float-btn">
+🌿 Disease Detection
+</button>
+
+<button onclick="openModule('mandiModule')" class="float-btn">
+📊 Mandi Price
+</button>
+
+<button onclick="openModule('riskModule')" class="float-btn">
+⚠ Risk Alert
+</button>
+
+<button onclick="openModule('schemeModule')" class="float-btn">
+🏛 Government Schemes
+</button>
+
+</section>
+
+
+
+<!-- MODULE 1 : DISEASE DETECTION -->
+
+<div id="diseaseModule" class="module">
+
+<h2>🌿 Disease Detection</h2>
+
+<form action="/predict" method="post" enctype="multipart/form-data">
+
+<div class="file-upload">
+
+<label for="leaf-upload" class="upload-btn">
+Upload Image
+</label>
+
+<input id="leaf-upload"
+       type="file"
+       name="leaf"
+       required
+       onchange="showFileName(this)"
+       style="display:none">
+
+<span id="file-name">
+{% if filename %}
+{{ filename }}
+{% else %}
+No file selected
+{% endif %}
+</span>
+
+</div>
+
+<button class="btn-dark" type="submit"
+onclick="this.innerText='Analyzing leaf...'">
+Run Diagnosis
+</button>
+
+</form>
+
+
+{% if disease %}
+
+
+<div class="result">
+
+<p><b>Disease:</b> {{ disease.replace("___"," - ").replace("_"," ") }}</p>
+
+<p><b>Confidence:</b> {{ confidence }}%</p>
+
+</div>
+
+{% if "healthy" in disease %}
+
+<div class="recommend">
+
+<h3 style="color:green;">🌿 Your crop is healthy</h3>
+
+<p>No disease detected. Your crop appears healthy.</p>
+
+</div>
+
+{% else %}
+
+<div class="recommend">
+
+<h3>Disease Prevention</h3>
+
+<p><b>Cause:</b> {{ info["Cause"] }}</p>
+<p><b>Prevention:</b> {{ info["Prevention"] }}</p>
+<p><b>Treatment:</b> {{ info["Treatment"] }}</p>
+<p><b>Pesticide:</b> {{ info["Pesticide"] }}</p>
+<p><b>Organic:</b> {{ info["Organic solution"] }}</p>
+
+</div>
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+
+
+<!-- MODULE 2 : MANDI PRICE -->
+
+<div id="mandiModule" class="module">
+
+<h2>📊 Mandi Price Prediction</h2>
+
+<input placeholder="Crop Name">
+<input placeholder="Farmer Location">
+<input placeholder="Production Cost">
+<input placeholder="Yield (quintals)">
+<input placeholder="Fuel Cost per km">
+<input type="date">
+
+<button class="btn-green">Analyze Market</button>
+
+<div class="profit-box">
+
+<h3>💰 Profit Comparison</h3>
+
+<p>Best Mandi: Bhubaneswar</p>
+<p>Predicted Price: ₹1450</p>
+<p>Transport Cost: ₹200</p>
+<p>Net Profit: ₹350 / quintal</p>
+
+<p class="profit">Recommendation: SELL after 7 days</p>
+
+</div>
+
+</div>
+
+
+
+<!-- MODULE 3 : RISK ALERT -->
+
+<div id="riskModule" class="module">
+
+<h2>⚠ Loss Risk Alert</h2>
+
+<p>Heavy rainfall expected in next 3 days.</p>
+
+<p>Harvest early and sell now.</p>
+
+</div>
+
+
+
+<!-- MODULE 4 : GOVERNMENT SCHEMES -->
+
+<div id="schemeModule" class="module">
+
+<h2>🏛 Government Schemes</h2>
+
+<input placeholder="Crop Type">
+<input placeholder="State">
+
+<select>
+<option>Risk Level</option>
+<option>Low</option>
+<option>Medium</option>
+<option>High</option>
+</select>
+
+<ul>
+<li>PM Kisan Yojana</li>
+<li>Crop Insurance</li>
+<li>Fertilizer Subsidy</li>
+</ul>
+
+<button class="btn-purple">Check Eligibility</button>
+
+</div>
+
+
+
+<script>
+
+function openModule(id){
+
+document.querySelectorAll(".module").forEach(m=>{
+m.style.display="none";
+});
+
+document.getElementById(id).style.display="block";
+
+}
+
+function showFileName(input){
+
+const fileName = input.files[0].name;
+
+document.getElementById("file-name").innerText = fileName;
+
+}
+
+/* Auto-open disease module after prediction */
+
+{% if disease %}
+window.onload = function(){
+openModule("diseaseModule");
+}
+{% endif %}
+
+</script>
+
+</body>
+</html>
