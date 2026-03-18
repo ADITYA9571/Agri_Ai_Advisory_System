@@ -224,6 +224,7 @@ __pycache__/
 
 # Static data folder (if large/generated)
 static/data/
+static/uploads/
 
 # Images
 *.jpg
