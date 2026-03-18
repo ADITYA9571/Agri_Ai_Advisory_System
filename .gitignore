@@ -224,3 +224,12 @@ __pycache__/
 
 # Static data folder (if large/generated)
 static/data/
+
+# Images
+*.jpg
+
+# JSON files (if private)
+*.json
+
+# ML models
+*.keras
