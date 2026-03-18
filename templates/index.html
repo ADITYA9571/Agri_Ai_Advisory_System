@@ -1,52 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>AI Smart Crop Health System</title>
-
 <link rel="stylesheet" href="/static/css/style.css">
-
 </head>
-
 <body>
 
-
-<!-- HERO SECTION -->
-
 <section class="hero">
-
 <div class="hero-left">
-
 <h1>AI Smart Crop Health & Market Advisor</h1>
-
 <p>
 Detect crop diseases, get treatment advice,
 predict mandi prices, and discover government schemes.
 </p>
 
-<button onclick="openModule('diseaseModule')" class="btn-primary">
-Start Analysis
-</button>
-
 </div>
-
 <div class="hero-right">
-
 <img src="/static/images/farmer.avif">
-
 </div>
-
 </section>
 
-
-
-<!-- FLOATING MODULE BUTTONS -->
-
 <section class="floating-menu">
-
 <button onclick="openModule('diseaseModule')" class="float-btn">
 🌿 Disease Detection
 </button>
@@ -62,21 +38,13 @@ Start Analysis
 <button onclick="openModule('schemeModule')" class="float-btn">
 🏛 Government Schemes
 </button>
-
 </section>
 
 
-
-<!-- MODULE 1 : DISEASE DETECTION -->
-
 <div id="diseaseModule" class="module">
-
 <h2>🌿 Disease Detection</h2>
-
 <form action="/predict" method="post" enctype="multipart/form-data">
-
 <div class="file-upload">
-
 <label for="leaf-upload" class="upload-btn">
 Upload Image
 </label>
@@ -95,44 +63,29 @@ Upload Image
 No file selected
 {% endif %}
 </span>
-
 </div>
 
 <button class="btn-dark" type="submit"
 onclick="this.innerText='Analyzing leaf...'">
 Run Diagnosis
 </button>
-
 </form>
 
-
 {% if disease %}
-
-
 <div class="result">
-
 <p><b>Disease:</b> {{ disease.replace("___"," - ").replace("_"," ") }}</p>
-
 <p><b>Confidence:</b> {{ confidence }}%</p>
-
 </div>
 
 {% if "healthy" in disease %}
-
 <div class="recommend">
-
 <h3 style="color:green;">🌿 Your crop is healthy</h3>
-
 <p>No disease detected. Your crop appears healthy.</p>
-
 </div>
-
 {% else %}
 
 <div class="recommend">
-
 <h3>Disease Prevention</h3>
-
 <p><b>Cause:</b> {{ info["Cause"] }}</p>
 <p><b>Prevention:</b> {{ info["Prevention"] }}</p>
 <p><b>Treatment:</b> {{ info["Treatment"] }}</p>
@@ -140,118 +93,396 @@ Run Diagnosis
 <p><b>Organic:</b> {{ info["Organic solution"] }}</p>
 
 </div>
-
 {% endif %}
-
 {% endif %}
-
 </div>
 
-
-
-<!-- MODULE 2 : MANDI PRICE -->
 
 <div id="mandiModule" class="module">
-
 <h2>📊 Mandi Price Prediction</h2>
+<select id="crop" onchange="updateMarkets()">
+<option value="">Select Crop</option>
+</select>
 
-<input placeholder="Crop Name">
-<input placeholder="Farmer Location">
-<input placeholder="Production Cost">
-<input placeholder="Yield (quintals)">
-<input placeholder="Fuel Cost per km">
-<input type="date">
+<select id="location">
+<option value="">Select Market</option>
+</select>
 
-<button class="btn-green">Analyze Market</button>
+<input id="production_cost" placeholder="Production Cost per quintal">
+<input id="yield" placeholder="Yield (quintals)">
+<input id="distance" placeholder="Distance to Mandi (km)">
+<input id="date" type="date">
+
+<button class="btn-green" onclick="predictMandi()">
+Analyze Market
+</button>
 
 <div class="profit-box">
-
 <h3>💰 Profit Comparison</h3>
-
-<p>Best Mandi: Bhubaneswar</p>
-<p>Predicted Price: ₹1450</p>
-<p>Transport Cost: ₹200</p>
-<p>Net Profit: ₹350 / quintal</p>
-
-<p class="profit">Recommendation: SELL after 7 days</p>
-
+<p>Best Mandi: <span id="best_mandi">-</span></p>
+<p>Predicted Price: ₹<span id="predicted_price">-</span></p>
+<p>Transport Cost: ₹<span id="transport_cost">-</span></p>
+<p>Net Profit: ₹<span id="net_profit">-</span> / quintal</p>
+<p class="profit">
+Recommendation: <span id="recommendation">-</span>
+</p>
+</div>
 </div>
 
-</div>
-
-
-
-<!-- MODULE 3 : RISK ALERT -->
 
 <div id="riskModule" class="module">
-
-<h2>⚠ Loss Risk Alert</h2>
-
-<p>Heavy rainfall expected in next 3 days.</p>
-
-<p>Harvest early and sell now.</p>
-
+<div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+    <h2 style="margin:0;">⚠ Loss Risk Alert</h2>
+    <button onclick="clearAlerts()" class="btn-dark" style="width:auto; padding:8px 16px;">
+        Clear
+    </button>
+</div>
+<div id="risk-content">
+<ul id="global-alerts"></ul>
+</div>
 </div>
 
 
-
-<!-- MODULE 4 : GOVERNMENT SCHEMES -->
-
 <div id="schemeModule" class="module">
-
 <h2>🏛 Government Schemes</h2>
 
-<input placeholder="Crop Type">
-<input placeholder="State">
+<select id="scheme_crop">
+<option value="">Select Crop</option>
+<option value="All">All Crops</option>
+<option value="Rice">Rice</option>
+<option value="Wheat">Wheat</option>
+<option value="Maize">Maize</option>
+<option value="Paddy">Paddy</option>
+<option value="Oilseeds">Oilseeds</option>
+<option value="Bamboo">Bamboo</option>
+<option value="Dairy">Dairy</option>
+<option value="Fishery">Fishery</option>
+<option value="Fruits/Vegetables">Fruits & Vegetables</option>
+<option value="Perishable crops">Perishable Crops</option>
+<option value="Organic">Organic Farming</option>
+</select>
 
-<select>
+<select id="scheme_state">
+<option value="">Select State</option>
+<option value="All">All States</option>
+<option>Andhra Pradesh</option>
+<option>Arunachal Pradesh</option>
+<option>Assam</option>
+<option>Bihar</option>
+<option>Chhattisgarh</option>
+<option>Goa</option>
+<option>Gujarat</option>
+<option>Haryana</option>
+<option>Himachal Pradesh</option>
+<option>Jharkhand</option>
+<option>Karnataka</option>
+<option>Kerala</option>
+<option>Madhya Pradesh</option>
+<option>Maharashtra</option>
+<option>Manipur</option>
+<option>Meghalaya</option>
+<option>Mizoram</option>
+<option>Nagaland</option>
+<option>Odisha</option>
+<option>Punjab</option>
+<option>Rajasthan</option>
+<option>Sikkim</option>
+<option>Tamil Nadu</option>
+<option>Telangana</option>
+<option>Tripura</option>
+<option>Uttar Pradesh</option>
+<option>Uttarakhand</option>
+<option>West Bengal</option>
+</select>
+
+<!-- Risk (kept but unused) -->
+<select id="scheme_risk">
 <option>Risk Level</option>
 <option>Low</option>
 <option>Medium</option>
 <option>High</option>
 </select>
 
-<ul>
-<li>PM Kisan Yojana</li>
-<li>Crop Insurance</li>
-<li>Fertilizer Subsidy</li>
-</ul>
-
-<button class="btn-purple">Check Eligibility</button>
-
+<button class="btn-purple" onclick="filterSchemes()">Check Eligibility</button>
+<div id="scheme-results"></div>
 </div>
 
 
 
 <script>
+let globalAlerts = [];
+let schemesData = [];
+
+
+async function loadSchemes(){
+    let response = await fetch("/static/data/schemes.json");
+    schemesData = await response.json();
+
+    console.log("Schemes loaded:", schemesData);
+}
+
+
+function filterSchemes(){
+    let crop = document.getElementById("scheme_crop").value;
+    let state = document.getElementById("scheme_state").value;
+    if(!crop || !state){
+        alert("Please select crop and state");
+        return;
+    }
+
+    crop = crop.toLowerCase().trim();
+    state = state.toLowerCase().trim();
+    if(crop === "rice") crop = "paddy";
+
+    let results = schemesData.filter(s => {
+        let sCrop = (s.crop || "").toLowerCase().trim();
+        let sState = (s.state || "").toLowerCase().trim();
+        let cropMatch =
+        sCrop === "all" ||
+        crop === "all" ||
+        sCrop.includes(crop) ||
+        crop.includes(sCrop);
+        let stateMatch =
+        sState === "all" ||
+        state === "all" ||
+        sState.includes(state) ||
+        state.includes(sState);
+        return cropMatch && stateMatch;
+    });
+    console.log("Filtered results:", results);
+    displaySchemes(results);
+}
+
+
+function displaySchemes(data){
+    let container = document.getElementById("scheme-results");
+    container.innerHTML = "";
+    if(data.length === 0){
+        container.innerHTML = "<p>No schemes found</p>";
+        return;
+    }
+
+    data.forEach(s => {
+        container.innerHTML += `
+            <div class="scheme-card">
+                <h4>${s.scheme_name}</h4>
+                <p>${s.benefit}</p>
+            </div>
+        `;
+    });
+}
+
 
 function openModule(id){
-
-document.querySelectorAll(".module").forEach(m=>{
-m.style.display="none";
+    document.querySelectorAll(".module").forEach(m=>{
+    m.style.display="none";
 });
 
 document.getElementById(id).style.display="block";
-
+if(id === "riskModule"){
+    renderGlobalAlerts();
+    }
 }
+
 
 function showFileName(input){
-
-const fileName = input.files[0].name;
-
-document.getElementById("file-name").innerText = fileName;
-
+    const fileName = input.files[0].name;
+    document.getElementById("file-name").innerText = fileName;
 }
 
-/* Auto-open disease module after prediction */
 
-{% if disease %}
+function renderGlobalAlerts(){
+let list = document.getElementById("global-alerts");
+list.innerHTML = "";
+if(globalAlerts.length === 0){
+    list.innerHTML = "<li>No alerts available</li>";
+    return;
+}
+
+globalAlerts.forEach(alert=>{
+    let li = document.createElement("li");
+    li.innerText = alert;
+    list.appendChild(li);
+});
+}
+
+
+async function loadMandiOptions(){
+    let response = await fetch("/mandi_options")
+    let data = await response.json()
+    let cropSelect = document.getElementById("crop")
+
+    data.crops.sort().forEach(crop=>{
+    let option = document.createElement("option")
+    option.value = crop
+    option.text = crop
+    cropSelect.appendChild(option)
+    })
+}
+
+
+async function updateMarkets(){
+    let crop = document.getElementById("crop").value
+    let response = await fetch(`/markets_by_crop?crop=${crop}`)
+    let data = await response.json()
+    let marketSelect = document.getElementById("location")
+
+    marketSelect.innerHTML = '<option value="">Select Market</option>'
+    data.markets.sort().forEach(market=>{
+    let option = document.createElement("option")
+    option.value = market
+    option.text = market
+    marketSelect.appendChild(option)
+    })
+}
+
+
+function clearAlerts(){
+    globalAlerts = [];
+    localStorage.removeItem("alerts");     // alerts
+    localStorage.removeItem("mandiData");  // mandi
+
+    if(document.getElementById("riskModule").style.display === "block"){
+        renderGlobalAlerts();
+    }
+}
+
+
+async function predictMandi(){
+
+let crop = document.getElementById("crop").value
+let location = document.getElementById("location").value
+let production_cost = document.getElementById("production_cost").value
+let yield_val = document.getElementById("yield").value
+let distance = document.getElementById("distance").value
+let date = document.getElementById("date").value
+
+if(!crop || !location || !production_cost || !yield_val || !distance || !date){
+    alert("Please fill all fields");
+    return;
+}
+let response = await fetch("/predict_mandi", {
+method: "POST",
+headers: {"Content-Type":"application/json"},
+body: JSON.stringify({
+crop: crop,
+location: location,
+production_cost: production_cost,
+yield: yield_val,
+distance: distance,
+date: date
+})
+})
+
+let data = await response.json()
+if(data.error){
+    alert(data.error);
+    return;
+}
+
+document.getElementById("best_mandi").innerText = data.best_mandi
+document.getElementById("predicted_price").innerText = data.predicted_price
+document.getElementById("transport_cost").innerText = data.transport_cost
+document.getElementById("net_profit").innerText = data.net_profit
+
+let rec = document.getElementById("recommendation")
+rec.innerText = data.recommendation;
+rec.classList.remove("recommend-sell","recommend-hold")
+
+if(data.recommendation.startsWith("SELL")){
+    rec.classList.add("recommend-sell")
+}
+
+if(data.recommendation.startsWith("HOLD")){
+    rec.classList.add("recommend-hold")
+}
+
+globalAlerts = globalAlerts.filter(a =>
+    !a.toLowerCase().includes("price") &&
+    !a.toLowerCase().includes("weather") &&
+    !a.includes("📈") &&
+    !a.includes("📉")
+);
+
+data.alerts.forEach(a => {
+    if(!globalAlerts.includes(a)){
+        globalAlerts.push(a);
+    }
+});
+
+localStorage.setItem("mandiData", JSON.stringify(data));
+localStorage.setItem("alerts", JSON.stringify(globalAlerts));
+renderGlobalAlerts();
+}
+
+
 window.onload = function(){
-openModule("diseaseModule");
-}
-{% endif %}
+    if(!sessionStorage.getItem("visited")){
+        localStorage.removeItem("alerts");
+        localStorage.removeItem("mandiData");
+        globalAlerts = [];
+        sessionStorage.setItem("visited", "true");
+    }
+
+    loadSchemes();
+    loadMandiOptions();
+    let savedAlerts = localStorage.getItem("alerts");
+    if(savedAlerts){
+        globalAlerts = JSON.parse(savedAlerts);
+    }
+
+    let saved = localStorage.getItem("mandiData");
+    if(saved) {
+        let data = JSON.parse(saved);
+        if(data.alerts){
+            globalAlerts = globalAlerts.filter(a =>
+            !a.toLowerCase().includes("price") &&
+            !a.toLowerCase().includes("weather") &&
+            !a.includes("📈") &&
+            !a.includes("📉")
+        );
+
+            data.alerts.forEach(a => {
+                if(!globalAlerts.includes(a)){
+                    globalAlerts.push(a);
+                }
+            });
+        }
+        document.getElementById("best_mandi").innerText = data.best_mandi
+        document.getElementById("predicted_price").innerText = data.predicted_price
+        document.getElementById("transport_cost").innerText = data.transport_cost
+        document.getElementById("net_profit").innerText = data.net_profit
+
+        let rec = document.getElementById("recommendation")
+        rec.innerText = data.recommendation
+        rec.classList.remove("recommend-sell", "recommend-hold")
+        if (data.recommendation.startsWith("SELL")) {
+            rec.classList.add("recommend-sell")
+        }
+        if (data.recommendation.startsWith("HOLD")) {
+            rec.classList.add("recommend-hold")
+        }
+    }
+
+    {% if disease %}
+    openModule("diseaseModule");
+    globalAlerts = globalAlerts.filter(a =>
+        !a.includes("Crop is healthy") &&
+        !a.includes("Disease detected")
+    );
+
+    {% if "healthy" in disease %}
+    globalAlerts.push("🌿 Crop is healthy. No risk detected.");
+    {% else %}
+    globalAlerts.push("🦠 Disease detected. Please follow recommended treatment.");
+    {% endif %}
+
+    localStorage.setItem("alerts", JSON.stringify(globalAlerts));
+    {% endif %}
+
+renderGlobalAlerts();
+};
 
 </script>
-
 </body>
 </html>

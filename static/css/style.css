@@ -4,10 +4,6 @@ margin:0;
 background:#f7f8f4;
 }
 
-
-
-/* HERO SECTION */
-
 .hero{
 display:flex;
 align-items:center;
@@ -62,10 +58,6 @@ position:relative;
 z-index:2;
 }
 
-
-
-/* BUTTONS */
-
 .btn-primary{
 background:#2e7d32;
 color:white;
@@ -80,9 +72,9 @@ cursor:pointer;
 background:#2c3e50;
 color:white;
 border:none;
-padding:12px;
 border-radius:8px;
-width:100%;
+width: auto;   /* remove full width */
+padding: 8px 16px;
 }
 
 .btn-green{
@@ -103,62 +95,31 @@ border-radius:8px;
 width:100%;
 }
 
-
-
-/* MODULE SECTION */
-
 .modules{
-
 display:grid;
-
 grid-template-columns:repeat(3,1fr);
-
 gap:30px;
-
 padding:60px;
-
 }
 
-
-
-/* CARD DESIGN */
-
 .card{
-
 background:white;
-
 padding:25px;
-
 border-radius:20px;
-
 box-shadow:0 8px 20px rgba(0,0,0,0.08);
-
 }
 
 .card h2{
-
 margin-top:0;
-
 color:#2e7d32;
-
 }
 
-
-
-/* INPUTS */
-
 input,select{
-
 width:100%;
-
 padding:12px;
-
 margin:10px 0;
-
 border-radius:8px;
-
 border:1px solid #ddd;
-
 }
 
 .file-upload{
@@ -180,48 +141,28 @@ font-size:14px;
 color:#555;
 }
 
-
-
-/* RESULT BOX */
-
 .result{
-
 background:#eef3ff;
-
 padding:12px;
-
 border-radius:8px;
-
 margin-top:10px;
-
 }
 
 .recommend{
-
 background:#fff2e1;
-
 padding:12px;
-
 border-radius:8px;
-
 margin-top:10px;
-
 }
 
 .risk{
-
 border-left:6px solid red;
-
 background:#fff5f5;
-
 }
 
 .profit{
-
 color:#27ae60;
-
 font-weight:bold;
-
 }
 
 ul{
@@ -262,4 +203,41 @@ background:#eef3ff;
 padding:15px;
 border-radius:10px;
 margin-top:20px;
+}
+
+.recommend-sell{
+color: orange;
+font-weight: bold;
+}
+
+.recommend-hold{
+color: #27ae60;
+font-weight: bold;
+}
+
+.risk-high{
+color:red;
+font-weight:bold;
+}
+
+.risk-medium{
+color:orange;
+font-weight:bold;
+}
+
+.risk-low{
+color:#27ae60;
+font-weight:bold;
+}
+
+#alert-box{
+background:#fff5f5;
+padding:15px;
+border-radius:10px;
+border-left:6px solid red;
+}
+
+#alerts_list li{
+margin:6px 0;
+font-weight:500;
 }
