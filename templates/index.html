@@ -195,13 +195,6 @@ Recommendation: <span id="recommendation">-</span>
 <option>West Bengal</option>
 </select>
 
-<!-- Risk (kept but unused) -->
-<select id="scheme_risk">
-<option>Risk Level</option>
-<option>Low</option>
-<option>Medium</option>
-<option>High</option>
-</select>
 
 <button class="btn-purple" onclick="filterSchemes()">Check Eligibility</button>
 <div id="scheme-results"></div>
@@ -215,7 +208,7 @@ let schemesData = [];
 
 
 async function loadSchemes(){
-    let response = await fetch("/static/data/schemes.json");
+    let response = await fetch("/static/data/schemes.json?v=" + new Date().getTime())
     schemesData = await response.json();
 
     console.log("Schemes loaded:", schemesData);
@@ -257,16 +250,37 @@ function filterSchemes(){
 function displaySchemes(data){
     let container = document.getElementById("scheme-results");
     container.innerHTML = "";
+
     if(data.length === 0){
         container.innerHTML = "<p>No schemes found</p>";
         return;
     }
 
     data.forEach(s => {
+
+        let linkHTML = "";
+
+        // ✅ Only show link if exists
+        if(s.reference_link && s.reference_link !== "undefined"){
+            let link = s.reference_link;
+
+            // ensure valid format
+            if(!link.startsWith("http")){
+                link = "https://" + link;
+            }
+
+            linkHTML = `
+                <a href="${link}" target="_blank" rel="noopener noreferrer">
+                    🔗 View Official Website
+                </a>
+            `;
+        }
+
         container.innerHTML += `
             <div class="scheme-card">
                 <h4>${s.scheme_name}</h4>
                 <p>${s.benefit}</p>
+                ${linkHTML}
             </div>
         `;
     });
